@@ -1,6 +1,6 @@
 import './App.scss';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -17,12 +17,12 @@ interface ITable {
   index: number;
   tableComponent: <T>(props: T) => React.ReactElement<T>;
 }
-const fixedTables: ITable[] = [
-  { id: 'table-1', index: 0, tableComponent: (props) => <Table1 {...props} /> },
-  { id: 'table-2', index: 1, tableComponent: (props) => <Table2 {...props} /> },
-  { id: 'table-3', index: 2, tableComponent: (props) => <Table3 {...props} /> },
-  { id: 'table-4', index: 3, tableComponent: (props) => <Table4 {...props} /> },
-];
+// const fixedTables: ITable[] = [
+//   { id: 'table-1', index: 0, tableComponent: (props) => <Table1 {...props} /> },
+//   { id: 'table-2', index: 1, tableComponent: (props) => <Table2 {...props} /> },
+//   { id: 'table-3', index: 2, tableComponent: (props) => <Table3 {...props} /> },
+//   { id: 'table-4', index: 3, tableComponent: (props) => <Table4 {...props} /> },
+// ];
 
 // Đổi vị trí của 2 phần tử trong mảng
 // bằng cách thay đổi index của 2 phần tử đó
@@ -35,9 +35,58 @@ const reorder = (list: ITable[], startIndex: number, endIndex: number) => {
   return result.sort((a, b) => a.index - b.index);
 };
 
-export const App = () => {
-  const [tables, setTables] = useState(fixedTables);
+// Fake API call
+const fetchApi = async () => {
+  // const response = await fetch(
+  //   'https://api.jsonbin.io/b/5f9b1b5b4a82881d6b8b8b1f'
+  // );
+  // const data = await response.json();
 
+  const data = { message: 'data from api' };
+  return data;
+};
+
+export const App = () => {
+  const [data, setData] = useState<any>({});
+  const [tables, setTables] = useState<ITable[]>([]);
+  const fixedTables = useMemo<ITable[]>(
+    () => [
+      {
+        id: 'table-1',
+        index: 0,
+        tableComponent: (props) => <Table1 {...props} data={data} />,
+      },
+      {
+        id: 'table-2',
+        index: 1,
+        tableComponent: (props) => <Table2 {...props} />,
+      },
+      {
+        id: 'table-3',
+        index: 2,
+        tableComponent: (props) => <Table3 {...props} />,
+      },
+      {
+        id: 'table-4',
+        index: 3,
+        tableComponent: (props) => <Table4 {...props} />,
+      },
+    ],
+    [data]
+  );
+  useEffect(() => {
+    fetchApi()
+      .then((res) => {
+        setData(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  useEffect(() => {
+    setTables(fixedTables);
+  }, [fixedTables]);
   const onDragEnd = (result: DropResult) => {
     // Thả ra ngoài vùng droppable
     if (!result.destination) return;

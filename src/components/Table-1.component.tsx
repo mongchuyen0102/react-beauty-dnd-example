@@ -11,6 +11,7 @@ export const Table1: React.FC<any> = (props) => {
         <HolderOutlined />
       </div>
       <div className="content">Content 1</div>
+      <div className="content">{props.data.message}</div>
     </div>
   );
 };
