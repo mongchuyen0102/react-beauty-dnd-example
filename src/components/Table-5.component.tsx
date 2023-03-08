@@ -1,17 +1,16 @@
-import React from 'react';
 import { HolderOutlined } from '@ant-design/icons';
 
-export const Table5: React.FC<any> = (props) => {
+export const Table5 = ({
+  content = 'Mong Chuyen xinh dep',
+}: {
+  content?: string;
+}) => {
   return (
-    <div
-      className="table"
-      ref={props.innerRef}
-      {...props.draggableProps}
-      {...props.dragHandleProps}>
+    <div className="table">
       <div className="icon">
         <HolderOutlined />
       </div>
-      <div className="content">Content 5</div>
+      <div className="content">Table 5: {content}</div>
     </div>
   );
 };

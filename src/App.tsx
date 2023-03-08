@@ -1,131 +1,60 @@
 import './App.scss';
+import '/node_modules/react-grid-layout/css/styles.css';
+import '/node_modules/react-resizable/css/styles.css';
 
-import { useEffect, useMemo, useState } from 'react';
-import {
-  DragDropContext,
-  Draggable,
-  DropResult,
-  Droppable,
-} from 'react-beautiful-dnd';
+import GridLayout from 'react-grid-layout';
 import { Table1 } from './components/Table-1.component';
 import { Table2 } from './components/Table-2.component';
 import { Table3 } from './components/Table-3.component';
 import { Table4 } from './components/Table-4.component';
 
-interface ITable {
-  id: string;
-  index: number;
-  tableComponent: <T>(props: T) => React.ReactElement<T>;
-}
-// const fixedTables: ITable[] = [
-//   { id: 'table-1', index: 0, tableComponent: (props) => <Table1 {...props} /> },
-//   { id: 'table-2', index: 1, tableComponent: (props) => <Table2 {...props} /> },
-//   { id: 'table-3', index: 2, tableComponent: (props) => <Table3 {...props} /> },
-//   { id: 'table-4', index: 3, tableComponent: (props) => <Table4 {...props} /> },
-// ];
-
-// Đổi vị trí của 2 phần tử trong mảng
-// bằng cách thay đổi index của 2 phần tử đó
-const reorder = (list: ITable[], startIndex: number, endIndex: number) => {
-  const result = Array.from(list);
-
-  result[startIndex].index = endIndex;
-  result[endIndex].index = startIndex;
-
-  return result.sort((a, b) => a.index - b.index);
+const randomContent = () => {
+  const names = ['John', 'Paul', 'George', 'Ringo'];
+  return names[Math.floor(Math.random() * names.length)];
 };
 
-// Fake API call
-const fetchApi = async () => {
-  // const response = await fetch(
-  //   'https://api.jsonbin.io/b/5f9b1b5b4a82881d6b8b8b1f'
-  // );
-  // const data = await response.json();
-
-  const data = { message: 'data from api' };
-  return data;
-};
-
+/**
+ * GridLayout
+ * width: 1200px => 12 columns => 100px per column, nếu div có width > 100px thì sẽ bị dính vào div bên phải
+ * rowHeight: 100px => 1 row => 100px per row, nếu div có height > 100px thì sẽ bị dính vào div dưới
+ * x: thứ tự của column
+ * y: thứ tự của row
+ * w: số column mà div chiếm, nếu div hiển thị có width nhỏ hơn 100px thì phần bị chiếm sẽ nhìn như rỗng, nhưng vẫn chiếm space
+ * h: số row mà div chiếm, nếu div hiển thị có height nhỏ hơn 100px thì phần bị chiếm sẽ nhìn như rỗng, nhưng vẫn chiếm space
+ */
 export const App = () => {
-  const [data, setData] = useState<any>({});
-  const [tables, setTables] = useState<ITable[]>([]);
-  const fixedTables = useMemo<ITable[]>(
-    () => [
-      {
-        id: 'table-1',
-        index: 0,
-        tableComponent: (props) => <Table1 {...props} data={data} />,
-      },
-      {
-        id: 'table-2',
-        index: 1,
-        tableComponent: (props) => <Table2 {...props} />,
-      },
-      {
-        id: 'table-3',
-        index: 2,
-        tableComponent: (props) => <Table3 {...props} />,
-      },
-      {
-        id: 'table-4',
-        index: 3,
-        tableComponent: (props) => <Table4 {...props} />,
-      },
-    ],
-    [data]
-  );
-  useEffect(() => {
-    fetchApi()
-      .then((res) => {
-        setData(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const layout = [
+    { i: 'a', x: 0, y: 0, w: 1, h: 2 },
+    { i: 'b', x: 1, y: 0, w: 3, h: 1 },
+    { i: 'c', x: 2, y: 0, w: 1, h: 1 },
+    { i: 'd', x: 3, y: 0, w: 1, h: 1 },
+    { i: 'e', x: 4, y: 0, w: 1, h: 1 },
+  ];
 
-  useEffect(() => {
-    setTables(fixedTables);
-  }, [fixedTables]);
-  const onDragEnd = (result: DropResult) => {
-    // Thả ra ngoài vùng droppable
-    if (!result.destination) return;
-
-    console.log('source', result.source);
-    console.log('destination', result.destination);
-
-    const items = reorder(
-      tables,
-      result.source.index,
-      result.destination.index
-    );
-    setTables(items);
-  };
-
-  // Render table mới bằng cách map qua mảng tables
   return (
     <div className="App">
       <div className="wrap">
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="droppable" direction="vertical">
-            {(provided) => (
-              <div ref={provided.innerRef}>
-                {tables.map((table) => (
-                  <Draggable
-                    draggableId={table.id}
-                    index={table.index}
-                    key={table.id}>
-                    {(provided) => {
-                      return table.tableComponent(provided) as any;
-                    }}
-                  </Draggable>
-                ))}
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <GridLayout
+          className="layout"
+          layout={layout}
+          cols={12}
+          maxRows={1}
+          rowHeight={100}
+          width={1200}
+          isResizable={false}>
+          <div key="a">
+            <Table1 content={randomContent()} />
+          </div>
+          <div key="b">
+            <Table2 />
+          </div>
+          <div key="c">
+            <Table3 content={randomContent()} />
+          </div>
+          <div key="d">
+            <Table4 />
+          </div>
+        </GridLayout>
       </div>
     </div>
   );
