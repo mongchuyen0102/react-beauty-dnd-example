@@ -2,6 +2,7 @@ import './App.scss';
 import '/node_modules/react-grid-layout/css/styles.css';
 import '/node_modules/react-resizable/css/styles.css';
 
+import { useRef } from 'react';
 import GridLayout from 'react-grid-layout';
 import { Table1 } from './components/Table-1.component';
 import { Table2 } from './components/Table-2.component';
@@ -23,11 +24,13 @@ const randomContent = () => {
  * h: số row mà div chiếm, nếu div hiển thị có height nhỏ hơn 100px thì phần bị chiếm sẽ nhìn như rỗng, nhưng vẫn chiếm space
  */
 export const App = () => {
+  const ref = useRef(null);
+
   const layout = [
-    { i: 'a', x: 0, y: 0, w: 1, h: 2 },
-    { i: 'b', x: 1, y: 0, w: 3, h: 1 },
+    { i: 'a', x: 0, y: 0, w: 1, h: 1 },
+    { i: 'b', x: 1, y: 0, w: 1, h: 1 },
     { i: 'c', x: 2, y: 0, w: 1, h: 1 },
-    { i: 'd', x: 3, y: 0, w: 1, h: 1 },
+    { i: 'd', x: 3, y: 0, w: 2, h: 1 },
     { i: 'e', x: 4, y: 0, w: 1, h: 1 },
   ];
 
@@ -37,7 +40,7 @@ export const App = () => {
         <GridLayout
           className="layout"
           layout={layout}
-          cols={12}
+          cols={10}
           maxRows={1}
           rowHeight={100}
           width={1200}
@@ -51,9 +54,7 @@ export const App = () => {
           <div key="c">
             <Table3 content={randomContent()} />
           </div>
-          <div key="d">
-            <Table4 />
-          </div>
+          <Table4 key="d" ref={ref} />
         </GridLayout>
       </div>
     </div>
